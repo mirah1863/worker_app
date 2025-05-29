@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+import 'package:wtms_app/worker_task_list_page.dart';
+
 class ProfileScreen extends StatefulWidget {
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -56,6 +58,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
             buildInfoTile("Email", workerData!['email']),
             buildInfoTile("Phone Number", workerData!['phone']),
             buildInfoTile("Address", workerData!['address']),
+
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.task_alt),
+              label: const Text("My Tasks"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+                textStyle: const TextStyle(fontSize: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => WorkerTaskListPage(
+                          workerId: int.parse(workerData!['id'].toString()),
+                        ),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
