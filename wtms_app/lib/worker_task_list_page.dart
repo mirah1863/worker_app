@@ -25,7 +25,7 @@ class _WorkerTaskListPageState extends State<WorkerTaskListPage> {
 
   Future<void> fetchTasks() async {
     print("📡 Fetching tasks for worker_id: ${widget.workerId}");
-    final url = Uri.parse('http://10.138.130.55/wtms_api/get_works.php');
+    final url = Uri.parse('http://localhost/wtms_api/get_works.php');
     print("🌐 API URL: $url");
 
     try {
@@ -79,48 +79,51 @@ class _WorkerTaskListPageState extends State<WorkerTaskListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('My Tasks')),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                itemCount: tasks.length,
-                itemBuilder: (context, index) {
-                  final task = tasks[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    child: ListTile(
-                      title: Text(
-                        task['title'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+      body: Container(
+        color: Color(0xFFECEFF1),
+        child:
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                  itemCount: tasks.length,
+                  itemBuilder: (context, index) {
+                    final task = tasks[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(task['description']),
-                          const SizedBox(height: 8),
-                          Text("📅 Assigned: ${task['date_assigned']}"),
-                          Text("⏳ Due: ${task['due_date']}"),
-                        ],
-                      ),
-                      trailing: Text(
-                        task['status'].toUpperCase(),
-                        style: TextStyle(
-                          color:
-                              task['status'] == 'completed'
-                                  ? Colors.green
-                                  : Colors.red,
-                          fontWeight: FontWeight.bold,
+                      child: ListTile(
+                        title: Text(
+                          task['title'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 4),
+                            Text(task['description']),
+                            const SizedBox(height: 8),
+                            Text("📅 Assigned: ${task['date_assigned']}"),
+                            Text("⏳ Due: ${task['due_date']}"),
+                          ],
+                        ),
+                        trailing: Text(
+                          task['status'].toUpperCase(),
+                          style: TextStyle(
+                            color:
+                                task['status'] == 'completed'
+                                    ? Colors.green
+                                    : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () => goToSubmitPage(task),
                       ),
-                      onTap: () => goToSubmitPage(task),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
+      ),
     );
   }
 }

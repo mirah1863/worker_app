@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wtms_app/main_screen.dart';
 import 'register_screen.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
@@ -20,6 +21,7 @@ class WTMSApp extends StatelessWidget {
         '/register': (context) => RegisterScreen(),
         '/login': (context) => LoginScreen(),
         '/profile': (context) => ProfileScreen(),
+        '/main': (context) => MainScreen(),
       },
     );
   }

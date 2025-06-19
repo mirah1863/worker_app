@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
+import 'package:wtms_app/main_screen.dart';
+// ignore: unused_import
 import 'package:wtms_app/worker_task_list_page.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -11,6 +13,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? workerData;
+
+  final fullNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+  final addressController = TextEditingController();
 
   @override
   void initState() {
@@ -24,7 +31,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (jsonString != null) {
       setState(() {
         workerData = json.decode(jsonString);
+        fullNameController.text = workerData!['full_name'] ?? '';
+        emailController.text = workerData!['email'] ?? '';
+        phoneController.text = workerData!['phone'] ?? '';
+        addressController.text = workerData!['address'] ?? '';
       });
+    }
+  }
+
+  Future<void> updateProfile() async {
+    print("Sending update request...");
+    var url = Uri.parse("http://localhost/wtms_api/update_profile.php");
+
+    var response = await http
+        .post(
+          url,
+          body: {
+            'worker_id': workerData!['id'].toString(),
+            'full_name': fullNameController.text,
+            'email': emailController.text,
+            'phone': phoneController.text,
+            'address': addressController.text,
+          },
+        )
+        .timeout(Duration(seconds: 5));
+
+    print("Response received: ${response.body}");
+
+    try {
+      var result = json.decode(response.body);
+      print("Decoded result: $result");
+
+      if (result['success'] == true) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Profile updated!")));
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Update failed")));
+      }
+    } catch (e) {
+      print("ERROR during update: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Connection error. Check server or internet.")),
+      );
     }
   }
 
@@ -53,12 +104,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            buildInfoTile("Worker ID", workerData!['id'].toString()),
-            buildInfoTile("Full Name", workerData!['full_name']),
-            buildInfoTile("Email", workerData!['email']),
-            buildInfoTile("Phone Number", workerData!['phone']),
-            buildInfoTile("Address", workerData!['address']),
-
+            TextFormField(
+              enabled: false,
+              decoration: InputDecoration(labelText: "Username"),
+              initialValue: workerData!['username'] ?? 'N/A',
+            ),
+            TextFormField(
+              controller: fullNameController,
+              decoration: InputDecoration(labelText: "Full Name"),
+            ),
+            TextFormField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: "Email"),
+            ),
+            TextFormField(
+              controller: phoneController,
+              decoration: InputDecoration(labelText: "Phone Number"),
+            ),
+            TextFormField(
+              controller: addressController,
+              decoration: InputDecoration(labelText: "Address"),
+              maxLines: 2,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: Icon(Icons.save),
+              label: Text("Save Changes"),
+              onPressed: updateProfile,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+            ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               icon: const Icon(Icons.task_alt),
@@ -76,13 +153,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder:
-                        (context) => WorkerTaskListPage(
-                          workerId: int.parse(workerData!['id'].toString()),
-                        ),
+                    builder: (context) => MainScreen(initialIndex: 0),
                   ),
                 );
               },
@@ -91,9 +165,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
-
-  Widget buildInfoTile(String title, String value) {
-    return Card(child: ListTile(title: Text(title), subtitle: Text(value)));
   }
 }

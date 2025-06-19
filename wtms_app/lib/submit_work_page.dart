@@ -33,7 +33,7 @@ class _SubmitWorkPageState extends State<SubmitWorkPage> {
 
     setState(() => isSubmitting = true);
 
-    final url = Uri.parse('http://10.138.130.55/wtms_api/submit_work.php');
+    final url = Uri.parse('http://localhost/wtms_api/submit_work.php');
 
     try {
       final response = await http.post(

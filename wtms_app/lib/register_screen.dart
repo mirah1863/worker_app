@@ -11,6 +11,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final usernameController = TextEditingController();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -28,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     var response = await http.post(
       url,
       body: {
+        'username': usernameController.text,
         'full_name': nameController.text,
         'email': emailController.text,
         'password': passwordController.text,
@@ -67,6 +69,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
           key: _formKey,
           child: ListView(
             children: [
+              TextFormField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  labelText: "Username",
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 16.0,
+                    horizontal: 12.0,
+                  ),
+                ),
+                validator: (value) => value!.isEmpty ? "Required" : null,
+              ),
               TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
